@@ -1,8 +1,10 @@
 import React from 'react';
-import { RectButtonProperties } from 'react-native-gesture-handler';
-import { Container, ButtonText } from './styles';
 
-//propriedades do RectButton
+
+
+import styled from 'styled-components/native';
+import { RectButton, RectButtonProperties } from 'react-native-gesture-handler';
+
 interface ButtonProps extends RectButtonProperties {
     children: string;
 }
@@ -10,11 +12,31 @@ interface ButtonProps extends RectButtonProperties {
 const Button: React.FC<ButtonProps> = ({ children, ...rest }) => {
 
     return (
-        //Container =>RectButton
         <Container {...rest}>
             <ButtonText>{children}</ButtonText>
         </Container>
-    );
+    )
 }
 
 export default Button;
+
+
+
+
+//Styles
+const Container = styled(RectButton)`
+    width: 100%;
+    height: 60px;
+    background: #ff9000;
+    border-radius: 10px;
+
+    justify-content: center;
+    align-items: center;
+`;
+
+const ButtonText = styled.TextInput`
+    font-family: 'RobotoSlab-Medium';
+    color: #312e38;
+    font-size:20px;
+`;
+
