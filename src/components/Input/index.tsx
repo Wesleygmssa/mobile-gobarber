@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useCallback, useEffect, useRef, useImperativeHandle, forwardRef, useState } from 'react';
 import Icon from 'react-native-vector-icons/Feather';
 import { useField } from '@unform/core';
 
 //propiedades di input
 import { TextInputProps } from 'react-native';
-import styled from 'styled-components/native';
+
+
+
 
 interface InputProps extends TextInputProps {
   name: string;
@@ -24,6 +26,23 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = ({ name, ico
   const inputElementRef = useRef<any>(null);
   const { fieldName, registerField, defaultValue = '', error } = useField(name);
   const inputValueRef = useRef<InputValueReferece>({ value: defaultValue });
+
+  const [isFocused, setIsFocused] = useState(false);
+  const [isFilled, setIsFilled] = useState(false);
+
+  const handleInputFocus = useCallback(() => {
+    setIsFocused(true);
+  }, [])
+
+  const handleInputBlur = useCallback(() => {
+    setIsFocused(false);
+
+    if (inputValueRef.current.value) {
+      setIsFilled(true)
+    } else {
+      setIsFilled(false)
+    }
+  }, [])
 
 
   useImperativeHandle(ref, () => ({
@@ -50,14 +69,16 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = ({ name, ico
   }, [fieldName, registerField])
 
   return (
-    <Container>
+    <Container isFocused={isFocused}>
 
-      <FeatherIcon name={icon} size={20} color="#666360" />
+      <FeatherIcon name={icon} size={20} color={isFocused || isFilled ? '#ff9000' : '#666360'} />
 
       <TextInput
         ref={inputElementRef}
         placeholderTextColor="#666360"
         defaultValue={defaultValue}
+        onFocus={handleInputFocus}
+        onBlur={handleInputBlur}
         onChangeText={(value) => { inputValueRef.current.value = value }}
         {...rest}
       />
@@ -70,7 +91,15 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = ({ name, ico
 export default forwardRef(Input);
 
 //Styles
-const Container = styled.View`
+
+import styled, { css } from 'styled-components/native';
+
+interface ContainerProps {
+  isFocused: boolean
+}
+
+
+const Container = styled.View<ContainerProps>`
   width: 100%;
   height: 60px;
   padding: 0 16px;
@@ -83,6 +112,10 @@ const Container = styled.View`
 
   flex-direction: row;
   align-items: center;
+
+  ${props => props.isFocused && css`
+      border-color: #ff9000;
+  `}
 
 `;
 
