@@ -1,31 +1,73 @@
-import React from 'react';
+import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import Icon from 'react-native-vector-icons/Feather';
+import { useField } from '@unform/core';
 
 //propiedades di input
 import { TextInputProps } from 'react-native';
-import styled, { css } from 'styled-components/native';
+import styled from 'styled-components/native';
 
 interface InputProps extends TextInputProps {
-    name: string;
-    icon: string;
+  name: string;
+  icon: string;
 
 }
 
-const Input: React.FC<InputProps> = ({ name, icon, ...rest }) => {
+interface InputValueReferece {
+  value: string;
+}
 
-    return (
-        <Container>
-            <FeatherIcon name={icon} size={20} color="#666360" />
-            <TextInput
-                placeholderTextColor="#666360"
-                {...rest}
-            />
-        </Container>
-    )
+interface InputRef {
+  focus(): void;
+}
+
+const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = ({ name, icon, ...rest }, ref) => {
+  const inputElementRef = useRef<any>(null);
+  const { fieldName, registerField, defaultValue = '', error } = useField(name);
+  const inputValueRef = useRef<InputValueReferece>({ value: defaultValue });
+
+
+  useImperativeHandle(ref, () => ({
+    focus() {
+      inputElementRef.current.focus();
+    }
+  }));
+
+
+  useEffect(() => {
+    registerField<string>({
+      name: fieldName,
+      ref: inputValueRef.current,
+      path: 'value',
+      setValue(ref: any, value) {
+        inputValueRef.current.value = value;
+        inputElementRef.current.setNativeProps({ text: value });
+      },
+      clearValue() {
+        inputValueRef.current.value = '';
+        inputElementRef.current.clear();
+      }
+    })
+  }, [fieldName, registerField])
+
+  return (
+    <Container>
+
+      <FeatherIcon name={icon} size={20} color="#666360" />
+
+      <TextInput
+        ref={inputElementRef}
+        placeholderTextColor="#666360"
+        defaultValue={defaultValue}
+        onChangeText={(value) => { inputValueRef.current.value = value }}
+        {...rest}
+      />
+
+    </Container>
+  )
 }
 
 
-export default Input;
+export default forwardRef(Input);
 
 //Styles
 const Container = styled.View`

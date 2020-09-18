@@ -25,7 +25,7 @@ export default Button;
 
 //Styles
 const Container = styled(RectButton)`
-    width: 100%;
+    width:320px;
     height: 60px;
     background: #ff9000;
     border-radius: 10px;
@@ -34,7 +34,7 @@ const Container = styled(RectButton)`
     align-items: center;
 `;
 
-const ButtonText = styled.TextInput`
+const ButtonText = styled.Text`
     font-family: 'RobotoSlab-Medium';
     color: #312e38;
     font-size:20px;
